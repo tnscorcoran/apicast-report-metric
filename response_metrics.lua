@@ -16,6 +16,11 @@ local function send_count_metrics()
   local document_count = ngx.resp.get_headers()['x-document-count'];
   local user_key = ngx.req.get_headers()['user_key'];
 
+
+
+  ngx.log(ngx.DEBUG, 'send_count_metrics')
+
+
   -- only report metrics if the response was a success and the custom header exists
   if ngx.status == ngx.HTTP_OK and document_count then
     ngx.log(ngx.INFO, '[3scale-metrics] sending metric to 3scale document-count: ', document_count)
@@ -42,12 +47,15 @@ function _M:post_action()
   local request_id = ngx.var.original_request_id
   local post_action_proxy = self.post_action_proxy
 
+  ngx.log(ngx.INFO, 'ngx.var.request_uri:' .. ngx.var.request_uri)
+
+
   if not post_action_proxy then
     return nil, 'not initialized'
   end
 
   -- send custom metrics if this is a document search
-  if ngx.var.request_uri:match '^/v1/documents' then
+  if ngx.var.request_uri:match '/broadband/features/docs' then
     send_count_metrics()
   end
 
